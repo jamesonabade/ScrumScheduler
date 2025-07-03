@@ -1,9 +1,16 @@
 {
-  "teamMembers": [],
+  "teamMembers": [
+    {
+      "name": "Jameson",
+      "color": "blue",
+      "id": 1,
+      "isActive": true
+    }
+  ],
   "scheduleBlocks": [],
   "meetings": [],
   "nextIds": {
-    "teamMembers": 1,
+    "teamMembers": 2,
     "scheduleBlocks": 1,
     "meetings": 1
   }

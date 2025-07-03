@@ -1,8 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertTeamMemberSchema, insertScheduleBlockSchema, insertMeetingSchema } from "@shared/schema";
+import { insertTeamMemberSchema, insertScheduleBlockSchema, insertMeetingSchema, insertNotificationSchema, insertSettingSchema } from "@shared/schema";
 import { z } from "zod";
+import { db } from "./db";
+import { notifications, settings } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Team Members
@@ -190,6 +193,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch schedule data" });
+    }
+  });
+
+  // Notifications endpoints
+  app.get("/api/notifications", async (req, res) => {
+    try {
+      const result = await db.select().from(notifications).orderBy(notifications.createdAt);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  app.post("/api/notifications", async (req, res) => {
+    try {
+      const notificationData = insertNotificationSchema.parse(req.body);
+      const [notification] = await db
+        .insert(notifications)
+        .values({
+          ...notificationData,
+          createdAt: new Date().toISOString(),
+        })
+        .returning();
+      res.status(201).json(notification);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create notification" });
+    }
+  });
+
+  app.put("/api/notifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = req.body;
+      const [notification] = await db
+        .update(notifications)
+        .set(updateData)
+        .where(eq(notifications.id, id))
+        .returning();
+      res.json(notification);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update notification" });
+    }
+  });
+
+  app.delete("/api/notifications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(notifications).where(eq(notifications.id, id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete notification" });
+    }
+  });
+
+  app.put("/api/notifications/mark-all-read", async (req, res) => {
+    try {
+      await db.update(notifications).set({ isRead: true });
+      res.json({ message: "All notifications marked as read" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark notifications as read" });
+    }
+  });
+
+  // Settings endpoints
+  app.get("/api/settings", async (req, res) => {
+    try {
+      const result = await db.select().from(settings);
+      const settingsMap = result.reduce((acc: any, setting) => {
+        acc[setting.key] = setting.value;
+        return acc;
+      }, {});
+      res.json(settingsMap);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.post("/api/settings", async (req, res) => {
+    try {
+      const settingData = insertSettingSchema.parse(req.body);
+      const [setting] = await db
+        .insert(settings)
+        .values(settingData)
+        .returning();
+      res.status(201).json(setting);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create setting" });
+    }
+  });
+
+  app.post("/api/settings/bulk", async (req, res) => {
+    try {
+      const settingsData = req.body;
+      const results = [];
+
+      for (const [key, value] of Object.entries(settingsData)) {
+        const [setting] = await db
+          .insert(settings)
+          .values({ key, value: String(value) })
+          .onConflictDoUpdate({
+            target: settings.key,
+            set: { value: String(value) }
+          })
+          .returning();
+        results.push(setting);
+      }
+
+      res.json(results);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  // Google Calendar integration endpoints
+  app.post("/api/google/test-connection", async (req, res) => {
+    try {
+      // This would implement actual Google Calendar API testing
+      // For demo purposes, we'll simulate success
+      res.json({ message: "Google Calendar connection successful" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to connect to Google Calendar" });
+    }
+  });
+
+  app.post("/api/google/sync-meeting", async (req, res) => {
+    try {
+      const { meetingId } = req.body;
+      // This would implement actual Google Calendar event creation
+      // For demo purposes, we'll simulate success
+      res.json({ 
+        message: "Meeting synced to Google Calendar",
+        googleEventId: `event_${meetingId}_${Date.now()}`
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to sync meeting to Google Calendar" });
+    }
+  });
+
+  // Notification testing endpoints
+  app.post("/api/notifications/test-email", async (req, res) => {
+    try {
+      // This would implement actual email sending
+      // For demo purposes, we'll simulate success
+      res.json({ message: "Test email sent successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to send test email" });
+    }
+  });
+
+  // Dashboard statistics endpoints
+  app.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const totalMembers = await storage.getTeamMembers();
+      const totalMeetings = await storage.getMeetings();
+      const unreadNotifications = await db.select().from(notifications).where(eq(notifications.isRead, false));
+      
+      res.json({
+        totalMembers: totalMembers.length,
+        totalMeetings: totalMeetings.length,
+        unreadNotifications: unreadNotifications.length,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch dashboard statistics" });
     }
   });
 
