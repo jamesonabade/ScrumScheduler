@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: scrumscheduler
+      POSTGRES_USER: scrumscheduler
+      POSTGRES_PASSWORD: scrumscheduler
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://scrumscheduler:scrumscheduler@db:5432/scrumscheduler
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    # Se quiser rodar migrations automaticamente, descomente a linha abaixo
+    command: sh -c "npm run db:push && npm start"
+
+volumes:
+  pgdata:

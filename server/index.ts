@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seeds";
+import dotenv from 'dotenv';
 
 const app = express();
 app.use(express.json());
@@ -39,11 +40,11 @@ app.use((req, res, next) => {
 
 (async () => {
   // Seed database on startup if empty
-  try {
-    await seedDatabase();
-  } catch (error) {
-    log("Database seeding failed, continuing with existing data");
-  }
+  // try {
+  //   await seedDatabase();
+  // } catch (error) {
+  //   log("Database seeding failed, continuing with existing data");
+  // }
 
   const server = await registerRoutes(app);
 

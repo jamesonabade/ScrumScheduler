@@ -1,66 +1,28 @@
-import { db } from "./db";
+import { db, pool } from "./db";
 import { teamMembers, scheduleBlocks, meetings, settings, notifications } from "@shared/schema";
 
 export async function seedDatabase() {
   try {
+
+    console.log("Cleaning existing data from database...");
+    // Deleta os dados em ordem reversa de dependência para evitar erros de chave estrangeira
+    await db.delete(notifications);
+    await db.delete(settings);
+    await db.delete(meetings);
+    await db.delete(scheduleBlocks);
+    await db.delete(teamMembers);
+    console.log("Existing data cleaned.");
+
+
     // Seed team members with the names from the whiteboard
     const members = await db.insert(teamMembers).values([
-      { 
-        name: 'Higor', 
-        color: 'blue', 
-        email: 'higor@scrum-team.com',
-        position: 'Product Owner',
-        timezone: 'America/Sao_Paulo',
-        isActive: true 
-      },
-      { 
-        name: 'Vitor', 
-        color: 'green', 
-        email: 'vitor@scrum-team.com',
-        position: 'Scrum Master',
-        timezone: 'America/Sao_Paulo',
-        isActive: true 
-      },
-      { 
-        name: 'Marcos', 
-        color: 'orange', 
-        email: 'marcos@scrum-team.com',
-        position: 'Senior Developer',
-        timezone: 'America/Sao_Paulo',
-        isActive: true 
-      },
-      { 
-        name: 'Jameson', 
-        color: 'purple', 
-        email: 'jameson@scrum-team.com',
-        position: 'Frontend Developer',
-        timezone: 'America/Sao_Paulo',
-        isActive: true 
-      },
-      { 
-        name: 'Ronaldo', 
-        color: 'teal', 
-        email: 'ronaldo@scrum-team.com',
-        position: 'Backend Developer',
-        timezone: 'America/Sao_Paulo',
-        isActive: true 
-      },
-      { 
-        name: 'Murilo', 
-        color: 'yellow', 
-        email: 'murilo@scrum-team.com',
-        position: 'Full Stack Developer',
-        timezone: 'America/Sao_Paulo',
-        isActive: true 
-      },
-      { 
-        name: 'Dárcio', 
-        color: 'pink', 
-        email: 'darcio@scrum-team.com',
-        position: 'DevOps Engineer',
-        timezone: 'America/Sao_Paulo',
-        isActive: true 
-      },
+        { name: 'Higor', color: 'blue', email: 'higor@scrum-team.com', position: 'Product Owner', timezone: 'America/Sao_Paulo', isActive: true },
+        { name: 'Vitor', color: 'green', email: 'vitor@scrum-team.com', position: 'Scrum Master', timezone: 'America/Sao_Paulo', isActive: true },
+        { name: 'Marcos', color: 'orange', email: 'marcos@scrum-team.com', position: 'Senior Developer', timezone: 'America/Sao_Paulo', isActive: true },
+        { name: 'Jameson', color: 'purple', email: 'jameson@scrum-team.com', position: 'Frontend Developer', timezone: 'America/Sao_Paulo', isActive: true },
+        { name: 'Ronaldo', color: 'teal', email: 'ronaldo@scrum-team.com', position: 'Backend Developer', timezone: 'America/Sao_Paulo', isActive: true },
+        { name: 'Murilo', color: 'yellow', email: 'murilo@scrum-team.com', position: 'Full Stack Developer', timezone: 'America/Sao_Paulo', isActive: true },
+        { name: 'Dárcio', color: 'pink', email: 'darcio@scrum-team.com', position: 'DevOps Engineer', timezone: 'America/Sao_Paulo', isActive: true },
     ]).returning();
 
     // Create realistic schedule blocks based on the whiteboard image
@@ -289,3 +251,14 @@ export async function seedDatabase() {
     console.error('Error seeding database:', error);
   }
 }
+
+async function main() {
+  try {
+    await seedDatabase();
+    await pool.end(); // Fecha a conexão para o script terminar
+  } catch (error) {
+    process.exit(1); // Sai com código de erro se o seed falhar
+  }
+}
+
+main();
