@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+
+  /* Custom team colors */
+  --team-blue: hsl(210, 100%, 95%);
+  --team-blue-border: hsl(210, 70%, 70%);
+  --team-blue-text: hsl(210, 100%, 25%);
+  
+  --team-green: hsl(120, 60%, 95%);
+  --team-green-border: hsl(120, 50%, 65%);
+  --team-green-text: hsl(120, 100%, 20%);
+  
+  --team-orange: hsl(30, 100%, 95%);
+  --team-orange-border: hsl(30, 80%, 65%);
+  --team-orange-text: hsl(30, 100%, 25%);
+  
+  --team-purple: hsl(270, 100%, 95%);
+  --team-purple-border: hsl(270, 60%, 65%);
+  --team-purple-text: hsl(270, 100%, 25%);
+  
+  --team-teal: hsl(180, 100%, 95%);
+  --team-teal-border: hsl(180, 50%, 65%);
+  --team-teal-text: hsl(180, 100%, 20%);
+  
+  --team-yellow: hsl(50, 100%, 95%);
+  --team-yellow-border: hsl(50, 80%, 65%);
+  --team-yellow-text: hsl(50, 100%, 25%);
+  
+  --team-pink: hsl(330, 100%, 95%);
+  --team-pink-border: hsl(330, 60%, 65%);
+  --team-pink-text: hsl(330, 100%, 25%);
+  
+  --overlap: hsl(30, 100%, 85%);
+  --overlap-border: hsl(30, 80%, 60%);
+  --overlap-text: hsl(30, 100%, 20%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .team-color-blue {
+    background-color: var(--team-blue);
+    border-color: var(--team-blue-border);
+    color: var(--team-blue-text);
+  }
+  
+  .team-color-green {
+    background-color: var(--team-green);
+    border-color: var(--team-green-border);
+    color: var(--team-green-text);
+  }
+  
+  .team-color-orange {
+    background-color: var(--team-orange);
+    border-color: var(--team-orange-border);
+    color: var(--team-orange-text);
+  }
+  
+  .team-color-purple {
+    background-color: var(--team-purple);
+    border-color: var(--team-purple-border);
+    color: var(--team-purple-text);
+  }
+  
+  .team-color-teal {
+    background-color: var(--team-teal);
+    border-color: var(--team-teal-border);
+    color: var(--team-teal-text);
+  }
+  
+  .team-color-yellow {
+    background-color: var(--team-yellow);
+    border-color: var(--team-yellow-border);
+    color: var(--team-yellow-text);
+  }
+  
+  .team-color-pink {
+    background-color: var(--team-pink);
+    border-color: var(--team-pink-border);
+    color: var(--team-pink-text);
+  }
+  
+  .overlap-color {
+    background-color: var(--overlap);
+    border-color: var(--overlap-border);
+    color: var(--overlap-text);
+  }
+  
+  .schedule-block {
+    @apply relative cursor-move border-2 rounded-md transition-all duration-200;
+  }
+  
+  .schedule-block:hover {
+    @apply shadow-md;
+  }
+  
+  .resize-handle {
+    @apply absolute top-0 w-2 h-full rounded-md cursor-col-resize opacity-60 hover:opacity-100 transition-opacity;
+  }
+  
+  .resize-handle-left {
+    @apply left-0 rounded-r-none;
+  }
+  
+  .resize-handle-right {
+    @apply right-0 rounded-l-none;
+  }
+  
+  .timeline-grid {
+    background-image: 
+      linear-gradient(to right, hsl(20, 5.9%, 90%) 1px, transparent 1px);
+    background-size: calc(100% / 12) 100%;
+  }
+}
+
+@layer utilities {
+  .drag-none {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+}
